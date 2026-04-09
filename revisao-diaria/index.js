@@ -203,7 +203,15 @@ const systemPrompt = `${skill}
 ---
 
 IMPORTANTE - restrições desta fase:
-- Apenas as ferramentas do Notion estão disponíveis nesta execução (prefixo mcp__notion__).
+- Apenas as ferramentas do Notion customizadas (servidor 'notion', prefixo mcp__notion__) estão disponíveis. NÃO use ferramentas mcp__claude_ai_* — elas não funcionam neste ambiente.
+- As ferramentas disponíveis são exatamente estas 7:
+  - mcp__notion__search
+  - mcp__notion__query_data_source
+  - mcp__notion__get_database
+  - mcp__notion__get_page
+  - mcp__notion__get_page_content
+  - mcp__notion__create_page
+  - mcp__notion__update_page
 - Execute APENAS as etapas que dependem do Notion: Etapa 3 (Processar Tarefas), Etapa 4 (Planejamento do Dia), Etapa 5 (Lembrete SEBRAE) e o Resumo Final.
 - IGNORE completamente as Etapas 1 (Gmail) e 2 (WhatsApp) — não tente acessá-las.
 - Crie também uma tarefa placeholder no banco Ações - Master com título "Revisar Gmail e WhatsApp manualmente hoje", status Inbox, prazo hoje.
@@ -217,9 +225,9 @@ IDs importantes (use diretamente, NÃO use search para achar estes):
 - Recorrentes (database_id): 9ff396fc-a750-4e94-8ebf-9a00bf27f905
 
 Fluxo típico:
-1. Para listar/filtrar tarefas de Ações - Master: use query_data_source com data_source_id acima
-2. Para criar tarefas em Ações - Master: use create_page com parent_data_source_id acima
-3. Para Recorrentes: primeiro use get_database com o database_id acima para pegar o data_source_id dele, depois query_data_source com esse id`;
+1. Para listar/filtrar tarefas de Ações - Master: use mcp__notion__query_data_source com data_source_id acima
+2. Para criar tarefas em Ações - Master: use mcp__notion__create_page com parent_data_source_id acima
+3. Para Recorrentes: primeiro use mcp__notion__get_database com o database_id acima para pegar o data_source_id dele, depois mcp__notion__query_data_source com esse id`;
 
 console.log("🚀 Iniciando revisão diária...\n");
 
@@ -228,7 +236,24 @@ for await (const msg of query({
   options: {
     systemPrompt,
     mcpServers: { notion: notionServer },
-    allowedTools: ["mcp__notion__*"],
+    allowedTools: [
+      "mcp__notion__search",
+      "mcp__notion__query_data_source",
+      "mcp__notion__get_database",
+      "mcp__notion__get_page",
+      "mcp__notion__get_page_content",
+      "mcp__notion__create_page",
+      "mcp__notion__update_page",
+    ],
+    disallowedTools: [
+      "mcp__claude_ai_Notion",
+      "mcp__claude_ai_Gmail",
+      "mcp__claude_ai_Google_Calendar",
+      "mcp__claude_ai_Firecrawl",
+      "mcp__claude_ai_Zapier",
+      "mcp__claude_ai_Canva",
+    ],
+    settingSources: [],
     model: "claude-sonnet-4-6",
   },
 })) {
