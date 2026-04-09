@@ -90,6 +90,27 @@ const notionServer = createSdkMcpServer({
       },
     ),
     tool(
+      "get_database",
+      "Retorna detalhes de um database do Notion pelo ID, incluindo a lista de data sources (usada para descobrir o data_source_id necessário em query_data_source).",
+      {
+        database_id: z.string().describe("ID do database"),
+      },
+      async (args) => {
+        try {
+          const db = await notion.databases.retrieve({
+            database_id: args.database_id,
+          });
+          return ok({
+            id: db.id,
+            title: db.title,
+            data_sources: db.data_sources,
+          });
+        } catch (e) {
+          return fail(e.message);
+        }
+      },
+    ),
+    tool(
       "get_page",
       "Retorna as propriedades de uma página do Notion pelo ID.",
       {
@@ -186,7 +207,19 @@ IMPORTANTE - restrições desta fase:
 - Execute APENAS as etapas que dependem do Notion: Etapa 3 (Processar Tarefas), Etapa 4 (Planejamento do Dia), Etapa 5 (Lembrete SEBRAE) e o Resumo Final.
 - IGNORE completamente as Etapas 1 (Gmail) e 2 (WhatsApp) — não tente acessá-las.
 - Crie também uma tarefa placeholder no banco Ações - Master com título "Revisar Gmail e WhatsApp manualmente hoje", status Inbox, prazo hoje.
-- Quando terminar todas as etapas, responda exatamente: "Revisão diária concluída." e pare.`;
+- Quando terminar todas as etapas, responda exatamente: "Revisão diária concluída." e pare.
+
+---
+
+IDs importantes (use diretamente, NÃO use search para achar estes):
+- Ações - Master (database_id): 7f15aad5-243d-4192-951f-f8495748a53d
+- Ações - Master (data_source_id): 267b0342-ff4c-4e14-bfe0-67e10e2318df
+- Recorrentes (database_id): 9ff396fc-a750-4e94-8ebf-9a00bf27f905
+
+Fluxo típico:
+1. Para listar/filtrar tarefas de Ações - Master: use query_data_source com data_source_id acima
+2. Para criar tarefas em Ações - Master: use create_page com parent_data_source_id acima
+3. Para Recorrentes: primeiro use get_database com o database_id acima para pegar o data_source_id dele, depois query_data_source com esse id`;
 
 console.log("🚀 Iniciando revisão diária...\n");
 
