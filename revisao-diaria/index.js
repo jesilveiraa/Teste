@@ -41,6 +41,7 @@ Regras:
 - Execute as Etapas 1 (Gmail), 3 (Processar Tarefas no Notion), 4 (Planejamento do Dia com Calendar+Notion), 5 (Lembrete SEBRAE) e o Resumo Final.
 - IGNORE a Etapa 2 (WhatsApp) — ainda não temos integração com WhatsApp Web. Em vez disso, crie uma tarefa placeholder no banco Ações - Master com título "Revisar WhatsApp manualmente hoje", status Inbox, prazo hoje.
 - Na Etapa 1: crie rascunhos no Gmail via gmail_create_draft (nunca envie). Crie eventos no Google Calendar via gcal_create_event para compromissos identificados em e-mails. Crie tarefas no Notion (banco Ações - Master) para ações que não são eventos.
+- IMPORTANTE sobre Prazo: só preencha o campo "Prazo" em tarefas novas se o e-mail ou mensagem mencionar EXPLICITAMENTE uma data (ex: "até sexta", "prazo dia 15", "precisamos até amanhã"). Se não houver prazo explícito, DEIXE o campo Prazo em branco — não chute "hoje" ou "amanhã". As únicas exceções onde o prazo HOJE é obrigatório são: (a) a tarefa placeholder de WhatsApp, (b) a tarefa SEBRAE, (c) o Resumo Final.
 - Quando terminar todas as etapas, responda exatamente: "Revisão diária concluída." e pare.
 - NÃO use ferramentas de Firecrawl, Zapier, Canva (fora do escopo).
 
