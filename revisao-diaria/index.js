@@ -61,14 +61,19 @@ const notionServer = createSdkMcpServer({
     ),
     tool(
       "query_data_source",
-      "Consulta um data source (database) do Notion e retorna suas páginas. Aceita filtros e ordenação no formato da Notion API. Use o id retornado por notion search com object=data_source.",
+      "Consulta um data source (database) do Notion e retorna suas páginas. Use o data_source_id fornecido no system prompt.",
       {
         data_source_id: z.string().describe("ID do data source"),
         filter: z
-          .record(z.any())
+          .any()
           .optional()
-          .describe("Filtro no formato Notion API"),
-        sorts: z.array(z.any()).optional().describe("Ordenação Notion API"),
+          .describe(
+            "Filtro Notion API como OBJETO JSON (não string). Ex: { property: 'Status', status: { equals: 'Inbox' } }",
+          ),
+        sorts: z
+          .any()
+          .optional()
+          .describe("Array de ordenação Notion API como ARRAY (não string)"),
         page_size: z
           .number()
           .optional()
@@ -76,12 +81,18 @@ const notionServer = createSdkMcpServer({
       },
       async (args) => {
         try {
+          // aceita filter/sorts como objeto ou como string JSON (o Claude às vezes stringifica)
+          let filter = args.filter;
+          if (typeof filter === "string") filter = JSON.parse(filter);
+          let sorts = args.sorts;
+          if (typeof sorts === "string") sorts = JSON.parse(sorts);
+
           const params = {
             data_source_id: args.data_source_id,
             page_size: args.page_size ?? 25,
           };
-          if (args.filter) params.filter = args.filter;
-          if (args.sorts) params.sorts = args.sorts;
+          if (filter) params.filter = filter;
+          if (sorts) params.sorts = sorts;
           const res = await notion.dataSources.query(params);
           return ok(res.results);
         } catch (e) {
@@ -236,6 +247,9 @@ for await (const msg of query({
   options: {
     systemPrompt,
     mcpServers: { notion: notionServer },
+    // tools: [] desabilita TODAS as ferramentas built-in (Bash, Read, Write,
+    // Agent, ToolSearch, TodoWrite, etc.) — restam só as de mcpServers.
+    tools: [],
     allowedTools: [
       "mcp__notion__search",
       "mcp__notion__query_data_source",
@@ -244,14 +258,6 @@ for await (const msg of query({
       "mcp__notion__get_page_content",
       "mcp__notion__create_page",
       "mcp__notion__update_page",
-    ],
-    disallowedTools: [
-      "mcp__claude_ai_Notion",
-      "mcp__claude_ai_Gmail",
-      "mcp__claude_ai_Google_Calendar",
-      "mcp__claude_ai_Firecrawl",
-      "mcp__claude_ai_Zapier",
-      "mcp__claude_ai_Canva",
     ],
     settingSources: [],
     model: "claude-sonnet-4-6",
