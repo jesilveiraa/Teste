@@ -250,9 +250,6 @@ for await (const msg of query({
     // strictMcpConfig: true força usar SOMENTE os mcpServers declarados acima,
     // ignorando quaisquer MCPs vindos de login de conta Claude.ai (cowork).
     strictMcpConfig: true,
-    // tools: [] desabilita TODAS as ferramentas built-in (Bash, Read, Write,
-    // Agent, ToolSearch, TodoWrite, etc.) — restam só as de mcpServers.
-    tools: [],
     allowedTools: [
       "mcp__notion__search",
       "mcp__notion__query_data_source",
@@ -261,6 +258,23 @@ for await (const msg of query({
       "mcp__notion__get_page_content",
       "mcp__notion__create_page",
       "mcp__notion__update_page",
+    ],
+    // Bloqueia ferramentas built-in que confundem o Claude quando ele não
+    // consegue chamar o que quer — sem esse bloco ele tenta delegar pro Agent
+    // ou sair rodando Bash em loop.
+    disallowedTools: [
+      "Bash",
+      "Agent",
+      "ToolSearch",
+      "TodoWrite",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch",
     ],
     settingSources: [],
     model: "claude-sonnet-4-6",
