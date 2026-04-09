@@ -13,15 +13,15 @@ console.log("NOTION_TOKEN presente:", !!process.env.NOTION_TOKEN);
 console.log("\n--- Testando Notion API ---");
 const searchResult = await notion.search({
   query: "Ações",
-  filter: { property: "object", value: "database" },
+  filter: { property: "object", value: "data_source" },
   page_size: 3,
 });
 
 console.log("Resultados encontrados:", searchResult.results.length);
 for (const r of searchResult.results) {
   const title =
-    r.object === "database"
-      ? r.title?.[0]?.plain_text ?? "(sem título)"
+    r.object === "data_source"
+      ? r.name ?? r.title?.[0]?.plain_text ?? "(sem título)"
       : r.properties?.title?.title?.[0]?.plain_text ?? "(sem título)";
   console.log(" -", r.object, ":", title);
 }

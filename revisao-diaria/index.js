@@ -16,28 +16,28 @@ const tools = [
   {
     name: "notion_search",
     description:
-      "Busca páginas e databases no Notion por título. Retorna lista com id, object (page/database), title e url.",
+      "Busca páginas e data sources (databases) no Notion por título. Retorna lista com id, object (page/data_source), title e url.",
     input_schema: {
       type: "object",
       properties: {
         query: { type: "string", description: "Termo de busca pelo título" },
         filter_object: {
           type: "string",
-          enum: ["page", "database"],
-          description: "Opcional: filtrar só páginas ou só databases",
+          enum: ["page", "data_source"],
+          description: "Opcional: filtrar só páginas ou só data sources (databases)",
         },
       },
       required: ["query"],
     },
   },
   {
-    name: "notion_query_database",
+    name: "notion_query_data_source",
     description:
-      "Consulta um database do Notion e retorna suas páginas. Aceita filtros e ordenação no formato da Notion API.",
+      "Consulta um data source (database) do Notion e retorna suas páginas. Aceita filtros e ordenação no formato da Notion API. Use o id retornado por notion_search com object=data_source.",
     input_schema: {
       type: "object",
       properties: {
-        database_id: { type: "string", description: "ID do database" },
+        data_source_id: { type: "string", description: "ID do data source" },
         filter: {
           type: "object",
           description: "Filtro no formato da Notion API (opcional)",
@@ -51,7 +51,7 @@ const tools = [
           description: "Número máximo de resultados (padrão 25)",
         },
       },
-      required: ["database_id"],
+      required: ["data_source_id"],
     },
   },
   {
@@ -79,11 +79,14 @@ const tools = [
   {
     name: "notion_create_page",
     description:
-      "Cria uma nova página dentro de um database pai. Use para criar tarefas novas no banco 'Ações - Master'. As propriedades devem seguir o schema do database.",
+      "Cria uma nova página dentro de um data source (database) pai. Use para criar tarefas novas no banco 'Ações - Master'. As propriedades devem seguir o schema do data source.",
     input_schema: {
       type: "object",
       properties: {
-        parent_database_id: { type: "string", description: "ID do database pai" },
+        parent_data_source_id: {
+          type: "string",
+          description: "ID do data source pai",
+        },
         properties: {
           type: "object",
           description:
@@ -95,7 +98,7 @@ const tools = [
             "Opcional: blocos de conteúdo (children) da página. Cada bloco no formato Notion API.",
         },
       },
-      required: ["parent_database_id", "properties"],
+      required: ["parent_data_source_id", "properties"],
     },
   },
   {
@@ -132,19 +135,19 @@ async function executeTool(name, input) {
           object: r.object,
           url: r.url,
           title:
-            r.object === "database"
-              ? r.title?.[0]?.plain_text ?? "(sem título)"
+            r.object === "data_source"
+              ? r.name ?? r.title?.[0]?.plain_text ?? "(sem título)"
               : r.properties?.Name?.title?.[0]?.plain_text ??
                 r.properties?.Atividade?.title?.[0]?.plain_text ??
                 "(sem título)",
         }));
       }
-      case "notion_query_database": {
-        const params = { database_id: input.database_id };
+      case "notion_query_data_source": {
+        const params = { data_source_id: input.data_source_id };
         if (input.filter) params.filter = input.filter;
         if (input.sorts) params.sorts = input.sorts;
         params.page_size = input.page_size ?? 25;
-        const res = await notion.databases.query(params);
+        const res = await notion.dataSources.query(params);
         return res.results;
       }
       case "notion_get_page":
@@ -155,7 +158,7 @@ async function executeTool(name, input) {
       }
       case "notion_create_page": {
         const params = {
-          parent: { database_id: input.parent_database_id },
+          parent: { data_source_id: input.parent_data_source_id },
           properties: input.properties,
         };
         if (input.content) params.children = input.content;
