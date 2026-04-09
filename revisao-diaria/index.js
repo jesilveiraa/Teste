@@ -12,25 +12,41 @@ const systemPrompt = `${skill}
 
 ---
 
-IMPORTANTE - restrições desta fase:
+IMPORTANTE - ferramentas disponíveis nesta fase:
 
-Você tem acesso às ferramentas do Notion via MCP Cowork. Os nomes das ferramentas começam com mcp__claude_ai_Notion__ e incluem:
-- mcp__claude_ai_Notion__notion-search — busca páginas/databases
-- mcp__claude_ai_Notion__notion-fetch — retrieve detalhes por URL ou ID
-- mcp__claude_ai_Notion__notion-create-pages — cria novas páginas (tarefas)
-- mcp__claude_ai_Notion__notion-update-page — atualiza propriedades de uma página
-- mcp__claude_ai_Notion__notion-query-database-view — consulta view de database
+Você tem acesso às ferramentas do Cowork via MCPs já conectados. Use apenas estas famílias:
+
+Notion (mcp__claude_ai_Notion__*):
+- notion-search — busca páginas/databases
+- notion-fetch — retrieve detalhes por URL ou ID
+- notion-create-pages — cria novas páginas (tarefas)
+- notion-update-page — atualiza propriedades de uma página
+- notion-query-database-view — consulta view de database
+
+Gmail (mcp__claude_ai_Gmail__*):
+- gmail_search_messages — busca mensagens
+- gmail_read_message — lê o conteúdo de uma mensagem
+- gmail_read_thread — lê uma thread completa
+- gmail_create_draft — cria rascunhos de resposta (NÃO envia)
+- gmail_list_labels — lista labels
+- gmail_list_drafts — lista rascunhos
+
+Google Calendar (mcp__claude_ai_Google_Calendar__*):
+- gcal_list_events — lista eventos
+- gcal_create_event — cria evento
+- gcal_list_calendars — lista calendários
+- gcal_find_my_free_time — procura horários livres
 
 Regras:
-- Execute APENAS as etapas que dependem do Notion: Etapa 3 (Processar Tarefas), Etapa 4 (Planejamento do Dia), Etapa 5 (Lembrete SEBRAE) e o Resumo Final.
-- IGNORE completamente as Etapas 1 (Gmail) e 2 (WhatsApp) — não tente acessá-las.
-- Crie uma tarefa placeholder no banco Ações - Master com título "Revisar Gmail e WhatsApp manualmente hoje", status Inbox, prazo hoje.
+- Execute as Etapas 1 (Gmail), 3 (Processar Tarefas no Notion), 4 (Planejamento do Dia com Calendar+Notion), 5 (Lembrete SEBRAE) e o Resumo Final.
+- IGNORE a Etapa 2 (WhatsApp) — ainda não temos integração com WhatsApp Web. Em vez disso, crie uma tarefa placeholder no banco Ações - Master com título "Revisar WhatsApp manualmente hoje", status Inbox, prazo hoje.
+- Na Etapa 1: crie rascunhos no Gmail via gmail_create_draft (nunca envie). Crie eventos no Google Calendar via gcal_create_event para compromissos identificados em e-mails. Crie tarefas no Notion (banco Ações - Master) para ações que não são eventos.
 - Quando terminar todas as etapas, responda exatamente: "Revisão diária concluída." e pare.
-- NÃO use ferramentas de Gmail, Google Calendar, Firecrawl, Zapier, Canva (elas não fazem parte do escopo desta fase).
+- NÃO use ferramentas de Firecrawl, Zapier, Canva (fora do escopo).
 
 ---
 
-IDs importantes dos bancos:
+IDs importantes dos bancos Notion:
 - Ações - Master: https://www.notion.so/jesilveira/7f15aad5243d4192951ff8495748a53d
 - Recorrentes: https://www.notion.so/jesilveira/9ff396fca7504e948ebf9a00bf27f905`;
 
@@ -40,18 +56,27 @@ for await (const msg of query({
   prompt: "Execute a revisão diária de hoje seguindo as instruções do system prompt.",
   options: {
     systemPrompt,
-    // Auto-aprova qualquer ferramenta do MCP claude_ai (Notion/Gmail/Calendar
-    // etc.). Sem isso o CLI pede permissão interativa que trava o script.
+    // Auto-aprova ferramentas do Notion, Gmail e Google Calendar (todas do
+    // MCP claude_ai). Sem isso o CLI pede permissão interativa que trava.
     canUseTool: async (toolName, input) => {
-      if (toolName.startsWith("mcp__claude_ai_Notion__")) {
+      const allowed = [
+        "mcp__claude_ai_Notion__",
+        "mcp__claude_ai_Gmail__",
+        "mcp__claude_ai_Google_Calendar__",
+      ];
+      if (allowed.some((prefix) => toolName.startsWith(prefix))) {
         return { behavior: "allow", updatedInput: input };
       }
       return {
         behavior: "deny",
-        message: `Ferramenta ${toolName} fora do escopo desta fase (só Notion permitido).`,
+        message: `Ferramenta ${toolName} fora do escopo desta fase.`,
       };
     },
-    allowedTools: ["mcp__claude_ai_Notion"],
+    allowedTools: [
+      "mcp__claude_ai_Notion",
+      "mcp__claude_ai_Gmail",
+      "mcp__claude_ai_Google_Calendar",
+    ],
     model: "claude-sonnet-4-6",
   },
 })) {
