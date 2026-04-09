@@ -214,15 +214,24 @@ const systemPrompt = `${skill}
 ---
 
 IMPORTANTE - restrições desta fase:
-- Apenas as ferramentas do Notion customizadas (servidor 'notion', prefixo mcp__notion__) estão disponíveis. NÃO use ferramentas mcp__claude_ai_* — elas não funcionam neste ambiente.
-- As ferramentas disponíveis são exatamente estas 7:
-  - mcp__notion__search
-  - mcp__notion__query_data_source
-  - mcp__notion__get_database
-  - mcp__notion__get_page
-  - mcp__notion__get_page_content
-  - mcp__notion__create_page
-  - mcp__notion__update_page
+
+VOCÊ SÓ TEM ACESSO A ESTAS 7 FERRAMENTAS (todas prefixadas mcp__notion__):
+1. mcp__notion__search
+2. mcp__notion__query_data_source
+3. mcp__notion__get_database
+4. mcp__notion__get_page
+5. mcp__notion__get_page_content
+6. mcp__notion__create_page
+7. mcp__notion__update_page
+
+ABSOLUTAMENTE PROIBIDO tentar usar:
+- Qualquer ferramenta com prefixo mcp__claude_ai_* (elas vão falhar pedindo permissão interativa)
+- Ferramentas built-in: Bash, Agent, ToolSearch, TodoWrite, Read, Write, Edit, Glob, Grep, WebFetch
+- Ferramentas de Gmail, Google Calendar, Firecrawl, Canva, Zapier
+
+Se você não conseguir completar uma etapa com as 7 ferramentas acima, simplesmente pule ela e continue com as outras. NUNCA tente usar ferramentas do Claude.ai como alternativa.
+
+Escopo desta fase:
 - Execute APENAS as etapas que dependem do Notion: Etapa 3 (Processar Tarefas), Etapa 4 (Planejamento do Dia), Etapa 5 (Lembrete SEBRAE) e o Resumo Final.
 - IGNORE completamente as Etapas 1 (Gmail) e 2 (WhatsApp) — não tente acessá-las.
 - Crie também uma tarefa placeholder no banco Ações - Master com título "Revisar Gmail e WhatsApp manualmente hoje", status Inbox, prazo hoje.
@@ -247,9 +256,6 @@ for await (const msg of query({
   options: {
     systemPrompt,
     mcpServers: { notion: notionServer },
-    // strictMcpConfig: true força usar SOMENTE os mcpServers declarados acima,
-    // ignorando quaisquer MCPs vindos de login de conta Claude.ai (cowork).
-    strictMcpConfig: true,
     allowedTools: [
       "mcp__notion__search",
       "mcp__notion__query_data_source",
@@ -258,23 +264,6 @@ for await (const msg of query({
       "mcp__notion__get_page_content",
       "mcp__notion__create_page",
       "mcp__notion__update_page",
-    ],
-    // Bloqueia ferramentas built-in que confundem o Claude quando ele não
-    // consegue chamar o que quer — sem esse bloco ele tenta delegar pro Agent
-    // ou sair rodando Bash em loop.
-    disallowedTools: [
-      "Bash",
-      "Agent",
-      "ToolSearch",
-      "TodoWrite",
-      "Read",
-      "Write",
-      "Edit",
-      "Glob",
-      "Grep",
-      "NotebookEdit",
-      "WebFetch",
-      "WebSearch",
     ],
     settingSources: [],
     model: "claude-sonnet-4-6",
