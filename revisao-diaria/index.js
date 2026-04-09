@@ -247,6 +247,9 @@ for await (const msg of query({
   options: {
     systemPrompt,
     mcpServers: { notion: notionServer },
+    // strictMcpConfig: true força usar SOMENTE os mcpServers declarados acima,
+    // ignorando quaisquer MCPs vindos de login de conta Claude.ai (cowork).
+    strictMcpConfig: true,
     // tools: [] desabilita TODAS as ferramentas built-in (Bash, Read, Write,
     // Agent, ToolSearch, TodoWrite, etc.) — restam só as de mcpServers.
     tools: [],
