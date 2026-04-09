@@ -97,7 +97,10 @@ for await (const msg of query({
     systemPrompt,
     // MCP local do WhatsApp (via lharries/whatsapp-mcp). O Python MCP server
     // spawna aqui e conecta com o Go Bridge que precisa estar rodando em
-    // background (nohup) pra manter a sessão WhatsApp ativa.
+    // background (nohup) pra manter a sessão WhatsApp ativa. A env var
+    // WHATSAPP_DB_PATH aponta pro banco que o Go Bridge realmente escreve
+    // (/Users/jesilveira/store/messages.db) — por padrão o Python MCP
+    // procuraria em ../whatsapp-bridge/store/messages.db que não existe.
     mcpServers: {
       whatsapp: {
         command: "uv",
@@ -107,6 +110,9 @@ for await (const msg of query({
           "run",
           "main.py",
         ],
+        env: {
+          WHATSAPP_DB_PATH: "/Users/jesilveira/store/messages.db",
+        },
       },
     },
     // Auto-aprova ferramentas do Notion, Gmail, Google Calendar (MCPs do
