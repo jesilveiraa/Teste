@@ -54,6 +54,20 @@ Regras gerais:
 - Execute as Etapas 1 (Gmail), 2 (WhatsApp), 3 (Processar Tarefas no Notion), 4 (Planejamento do Dia com Calendar+Notion), 5 (Lembrete SEBRAE) e o Resumo Final.
 - Na Etapa 1 (Gmail): crie rascunhos via gmail_create_draft (nunca envie). Crie eventos no Google Calendar via gcal_create_event para compromissos com data/hora identificados em e-mails. Crie tarefas no Notion (banco Ações - Master) para ações que não são eventos.
 - IMPORTANTE sobre Prazo: só preencha o campo "Prazo" em tarefas novas se o e-mail ou mensagem mencionar EXPLICITAMENTE uma data (ex: "até sexta", "prazo dia 15", "precisamos até amanhã"). Se não houver prazo explícito, DEIXE o campo Prazo em branco — não chute "hoje" ou "amanhã". As únicas exceções onde o prazo HOJE é obrigatório são: (a) a tarefa SEBRAE, (b) o Resumo Final.
+
+REGRA CRÍTICA sobre o planejamento do dia (Etapa 4):
+O plano do dia NÃO é uma lista de todas as tarefas novas que você identificou. É baseado APENAS no que JÁ ESTÁ programado. A ordem de prioridade é fixa:
+  1. AGENDA (Google Calendar) — compromissos fixos com horário. Estes são inegociáveis.
+  2. TAREFAS RECORRENTES — as que se aplicam ao dia da semana de hoje.
+  3. TAREFAS COM PRAZO HOJE — tarefas que já existiam no Notion COM prazo = hoje (ou atrasadas).
+  4. SOMENTE SE SOBRAR TEMPO — sugestões do backlog (tarefas sem prazo ou Inbox).
+
+As tarefas novas criadas nas Etapas 1 e 2 desta mesma revisão SÓ entram no plano do dia se foram criadas COM prazo = hoje (porque a fonte mencionava data explícita). Se uma tarefa nova foi criada SEM prazo, ela NÃO aparece no plano do dia — é uma tarefa de backlog que Jéssica vai priorizar manualmente depois.
+
+Exemplo de ERRADO: "Gmail identificou um e-mail do Sicredi → criei tarefa sem prazo → coloquei no plano da manhã". NÃO FAÇA ISSO.
+Exemplo de CERTO: "Gmail identificou um e-mail com prazo dia 15/04 → criei tarefa com prazo 15/04 → NÃO entra no plano de hoje (prazo é 15/04, não hoje)".
+Exemplo de CERTO: "Calendar mostra reunião Suits às 9h → entra no plano da manhã como item fixo".
+
 - Quando terminar todas as etapas, responda exatamente: "Revisão diária concluída." e pare.
 - NÃO use ferramentas de Firecrawl, Zapier, Canva (fora do escopo).
 
