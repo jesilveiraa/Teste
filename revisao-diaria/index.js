@@ -68,7 +68,8 @@ Fluxo da conversa "Caixa de entrada 📥":
 1. Use list_messages com chat_jid="554792711777-1552997804@g.us" pra buscar as ~50 últimas mensagens (NÃO precisa procurar pelo nome — use o JID direto acima)
 2. Identifique a última mensagem com texto EXATAMENTE "OK" enviada pela PRÓPRIA Jéssica (sender é a própria usuária, não outra pessoa). Essa "OK" é o marcador de "até aqui já processei"
 3. Processe APENAS as mensagens que estão ABAIXO (mais recentes) desse último OK:
-   - Se o item é uma ação/tarefa → crie uma página no banco Ações - Master via Notion (status Inbox, SEM prazo a não ser que a mensagem mencione data explícita)
+   - Se o item começa com "IA:" → NÃO crie no Ações - Master. Crie no database **Projetos de IA** do IA Lab (data_source_id: e5d08c42-f617-496c-a650-37902a0a2b5d). Use o texto depois de "IA:" como Nome, preencha Origem="WhatsApp", Status="Não iniciada", e tente inferir a Área (LÍNIA/KNN/Pessoal/Doquia/Geral) pelo contexto.
+   - Se o item é uma ação/tarefa (sem prefixo IA:) → crie uma página no banco Ações - Master via Notion (status Inbox, SEM prazo a não ser que a mensagem mencione data explícita)
    - Se o item NÃO é uma tarefa (é uma anotação, link pra ler, coisa pra lembrar) → guarde pra encaminhar depois
 4. Após processar TODOS os items, envie a mensagem "OK" via send_message com recipient="554792711777-1552997804@g.us" — isso marca até onde processou
 5. Depois do OK, envie cada item não-tarefa de volta na mesma conversa via send_message (mesmo recipient) — isso deixa visível pra Jéssica decidir o que fazer com eles
