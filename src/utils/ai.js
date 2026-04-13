@@ -1,4 +1,5 @@
 import { MONTH_NAMES, PILARES } from './constants.js';
+import { KNN_MANUAL_VOICE, KNN_MANUAL_VOICE_COMPACT } from './knnManual.js';
 
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
 const MODEL = 'claude-sonnet-4-20250514';
@@ -35,11 +36,11 @@ function extractJSON(text) {
 }
 
 function buildBrandContext(brand) {
-  return `MARCA: KNN Saguaçu — Escola de Idiomas
-- Tom de voz: ${brand.tone}
+  return `MARCA: KNN Saguaçu — Escola de Idiomas (unidade local da rede nacional KNN Idiomas)
+- Tom de voz local: ${brand.tone}
 - Público-alvo: ${brand.audience}
 - Diferenciais: ${brand.differentials}
-- Evitar: ${brand.avoid}`;
+- Evitar (regra local): ${brand.avoid}`;
 }
 
 // ============================================================================
@@ -58,7 +59,9 @@ export async function generateIdeas(brand, monthInfo, year, month) {
 
   const pilaresDisponiveis = PILARES.map((p) => `  - ${p.id}: ${p.label}`).join('\n');
 
-  const prompt = `Você é um especialista em marketing digital para Instagram de escolas de idiomas, seguindo o Manual Oficial da marca KNN Idiomas.
+  const prompt = `Você é um especialista em marketing digital para Instagram de escolas de idiomas, seguindo OBRIGATORIAMENTE o Manual Oficial da marca KNN Idiomas reproduzido abaixo.
+
+${KNN_MANUAL_VOICE_COMPACT}
 
 ${buildBrandContext(brand)}
 
@@ -71,6 +74,8 @@ PILARES EDITORIAIS DISPONÍVEIS (use os IDs):
 ${pilaresDisponiveis}
 
 TAREFA: Crie 12 ideias de conteúdo para o Instagram da KNN Saguaçu.
+
+IMPORTANTE: todas as ideias devem respeitar o tom de voz e as regras de linguagem do Manual Oficial KNN acima. Não sugerir preços, promoções agressivas, comparações com concorrentes, promessas irreais ou gírias exageradas.
 
 REGRAS DO MANUAL KNN (obrigatórias):
 1. Distribuição de formatos: aproximadamente 55% reel, 30% carrossel, 15% estatico
@@ -131,7 +136,9 @@ export async function generateScripts(brand, approvedIdeas, monthInfo, year, mon
     })
     .join('\n');
 
-  const prompt = `Você é um redator especialista em Instagram para escolas de idiomas, seguindo o Manual Oficial KNN.
+  const prompt = `Você é um redator especialista em Instagram para escolas de idiomas, seguindo OBRIGATORIAMENTE o Manual Oficial KNN Idiomas reproduzido abaixo.
+
+${KNN_MANUAL_VOICE}
 
 ${buildBrandContext(brand)}
 
@@ -148,11 +155,16 @@ TAREFA: Para CADA ideia acima (mantenha a mesma ordem e quantidade), gere um rot
 - Hashtags (mix de local + temáticas, 8-15 hashtags)
 - Data sugerida de publicação dentro do mês (formato YYYY-MM-DD)
 
-REGRAS:
-- Reels: ter gancho nos primeiros 3 segundos (manual cap. 6)
-- Carrosséis: capa com headline forte e promessa clara (manual cap. 7)
-- Evite linguagem formal/técnica e promessas irreais
-- CTA direto mas respeitoso
+REGRAS OBRIGATÓRIAS (do manual acima):
+- Siga RIGOROSAMENTE os 7 princípios do tom de voz KNN
+- Use as palavras do universo verbal KNN (transformação, evolução, conquista, etc.)
+- NUNCA use palavras proibidas (perfeito, milagre, fluência garantida, "barato", "promoção", gírias exageradas)
+- Reels: gancho nos primeiros 3 segundos (direto, emocional, impossível de ignorar)
+- Carrosséis: capa com headline curta + promessa clara; 1 conceito por slide; CTA no final
+- Estáticos: branding, frases inspiradoras ou comunicados institucionais
+- CTAs permitidos: comentar, salvar, enviar DM, chamar no WhatsApp, visitar a unidade — SEM mencionar preços/valores
+- Legendas: começar acolhedoras, mostrar benefício real, terminar com CTA claro mas respeitoso
+- Nunca compare com concorrentes, nunca prometa resultado garantido, nunca exponha alunos
 
 Responda APENAS com JSON válido (sem markdown, sem \`\`\`), na MESMA ORDEM das ideias:
 [
