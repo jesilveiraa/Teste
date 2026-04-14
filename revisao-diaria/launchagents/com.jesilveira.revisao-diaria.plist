@@ -7,12 +7,12 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/local/bin/node</string>
-        <string>/Users/jesilveira/Teste/revisao-diaria/index.js</string>
+        <string>/bin/bash</string>
+        <string>/Users/jesilveira/dev/revisao-diaria-repo/revisao-diaria/run-daily.sh</string>
     </array>
 
     <key>WorkingDirectory</key>
-    <string>/Users/jesilveira/Teste/revisao-diaria</string>
+    <string>/Users/jesilveira/dev/revisao-diaria-repo/revisao-diaria</string>
 
     <!-- Segunda a sexta às 7:30 -->
     <key>StartCalendarInterval</key>
