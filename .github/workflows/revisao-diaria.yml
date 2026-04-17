@@ -1,0 +1,35 @@
+name: Revisão Diária — Cloud
+
+on:
+  schedule:
+    # 7h45 BRT (UTC-3) = 10h45 UTC, segunda a sexta
+    - cron: '45 10 * * 1-5'
+  workflow_dispatch: # permite disparar manualmente pelo GitHub
+
+jobs:
+  revisao-diaria:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar Claude CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Instalar dependências
+        run: npm install
+        working-directory: revisao-diaria
+
+      - name: Rodar revisão diária
+        run: node index-cloud.js
+        working-directory: revisao-diaria
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
